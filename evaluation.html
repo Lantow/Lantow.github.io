@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<meta charset="utf-8">
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript"> 
+
+var data = [];
+
+// $("#all_the_stansas").ready(function(){$("#all_the_stansas").load("trial_text.txt")}); 
+
+$("document").ready(function(){
+	 //"http://localhost:8000/trial_text.txt")
+	$("#done").hide();
+	var all_sents = $('#all_the_stansas').val().split("<eos>");
+	$("#count").text(1 + " / " + all_sents.length)
+
+	var startTime = new Date().getTime();
+
+	// console.log(all_sents)
+	// console.log( $('#all_the_stansas').val());
+
+	thishere = all_sents[0].split("-");
+
+	$("#stansa").html(thishere[0]);
+	i = 1;
+
+	function JSON2CSV(objArray) {
+	    var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+	    var str = '';
+	    var line = '';
+
+	    for (var i = 0; i < array.length; i++) {
+	        var line = '';
+
+	        if (true) {
+	            for (var index in array[i]) {
+	                var value = array[i][index] + "";
+	                line += '' + value.replace(/"/g, '') + ',';
+	            }
+	        } else {
+	            for (var index in array[i]) {
+	                line += array[i][index] + ',';
+	            }
+	        }
+	        line = line.slice(0, -1);
+	        str += line + '\r\n';
+	    }
+	    return str;
+	}
+
+	var values = [2, 30, 20, 30, 35, 45];
+	$('#semantic').change(function() {
+	    $('span').text(values[this.value]);
+	});
+
+	var values = [2, 30, 20, 30, 35, 45];
+	$('#grammar').change(function() {
+	    $('span').text(values[this.value]);
+	});
+
+	$("button").click(function(){
+		nowTime = new Date().getTime()
+		var time = nowTime - startTime
+		startTime = nowTime
+		// log stansa label - ie. how it was generated
+		var label = thishere[1].replace('\n','').replace(" ", "");
+		// log user assesment
+		var grammar = $("#grammar").val()
+		var semantic = $("#semantic").val()
+		var turing = $(this).html()
+		d = {label:label, grammar:grammar, semantic:semantic, turing:turing, time:time} // ,rythm:rythm, overall:overall}
+		data.push(d);
+
+		if (i >= all_sents.length) {
+			$("#not_done").hide();
+			$("#done").show();
+			// prepare and download data
+			var csv = JSON2CSV(data);
+			var downloadLink = document.createElement("a");
+			var blob = new Blob(["\ufeff", csv]);
+			var url = URL.createObjectURL(blob);
+			downloadLink.href = url;
+			downloadLink.download = "data.txt";
+			document.body.appendChild(downloadLink);
+			downloadLink.click();
+		}else {
+			// change sentance
+			thishere = all_sents[i].split("-");
+			$("#stansa").html(thishere[0]);
+			
+			$("#last").text(i+ " was " + label)
+
+			i ++
+			$("#count").text(i + " / " + all_sents.length)
+
+			console.log(d);
+			// Reset values
+			$("#grammar").val(50);
+			$("#semantic").val(50);
+			$("#rythm").val(50);
+			$("#overall").val(50);
+		};
+	});
+})
+</script>
+<style type="text/css">
+html{
+	max-width: 100vw;
+	max-height: 90vw;
+}
+body {
+	text-align: center;
+	margin-left: 5vw;
+	font-family: sans-serif;
+}
+button{
+	border-radius:2vh;
+	margin: 2vw;
+	font-weight: bold;
+}
+.range-slider {
+  margin: 1vw 0 0 0%;
+}
+.range-slider {
+  width: $range-width;
+}
+.range-slider__range {
+  width: 50vw;
+  border-radius: 1vw;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+.poetic_value{
+	display: inline-block;
+}
+ </style>
+
+</head>
+<body>
+	<section id="not_done">
+		<h1 id="stansa"></h1>
+		<div id="count"></div>
+		<form action="">
+
+			<div class="range-slider">
+				<p>HOW <b>GRAMMATICALLY</b> CORRECT WAS THE SENTENCE?</p>
+				<input class="range-slider__range" id="grammar" type="range" value="3" min="0" max="6">
+			</div>
+
+			<div class="range-slider">
+				<p>HOW <b>POETICALLY</b> INTERPRETABLE WAS THE SENTENCE?</p>
+				<input class="range-slider__range" id="semantic" type="range" value="3" min="0" max="6">
+			</div>
+		</form>
+		<br>
+		<br>
+		<button>HUMAN</button><button>MACHINE</button>
+
+		<div id="last"></div>
+	</section>
+	<section id="done">
+		<br><br><br>
+		EXPERIMENT IS NOW CONCLUDED <br>
+		THANK YOU FOR YOUR PARTICIPATION!
+	</section>
+
+</body>
+
+<footer>
+<textarea id="all_the_stansas" style="visibility: hidden"> But that in her discourse thou follie saw<br> Tenfold with Heav’n and as darkness who renounce <br> With waters dispers’d in the wound of bones<br> Of Heav’ns grow from his place yet to I relapse  - DPsyllabic5lines 
+ <eos> 
+ Formost with in pain to heare bliss <br> Farr first in sleep what here thou have thou Morn <br> But in the brink to all ire high<br> By that created came for thy right  - DPsyllabic5lines 
+ <eos> 
+ The rest of more with hopes to lye<br> Relations dear with all thir Charities          <br> And to thy good erroneous to soon restor’d<br> All Glorie and in his place by all with bliss       - DPwords5lines 
+ <eos> 
+ Imemitary so harm and in a Starr    <br> By once thir Eye abasht with each Band       <br> And kencimer sostood them seemd the liv      <br> From Mean but warn and all other falln as cause      - Sylabic5lines 
+ <eos> 
+Not of Earth onely but of highest Heav’n<br>To whom thus Adam cleerd of doubt repli’d<br>How fully hast thou satisfi’d mee pure<br>Intelligence of Heav’n Angel serene - Milton 
+ <eos> 
+ His works and of his face But he<br> Some spake they pass for God is fall<br> And your planted then the day of Day <br> All from us substance but but best our - DPsyllabic5lines 
+ <eos> 
+ good bounds whom in all thee yet we be hee <br> To our can find what driv’n here till<br> All now who to his sight of<br> Thou shew whom thou arreede all Heav’n  - DPsyllabic5lines 
+ <eos> 
+ In Paradise that thing it disder shade      <br> Thither by Angels though this match of God    <br> With in a field day Air and all the Host     <br> She lighting in to Came highth she more adain     - Words5lines 
+ <eos> 
+ The happie great place but he whose voice        <br> Ere matter him by those shall down this<br> Heard from the Zenith the Fowle that it now farr      <br> Nor none in his nethermost Abyss   - DPwords5lines 
+ <eos> 
+ And exmorple Eden led the ground       <br> By his imbraces fraught by this recess      <br> But now the darkness works of Knowledge bright     <br> The Fiend for hard was with thir less a place      - Sylabic5lines 
+ <eos> 
+Which then not minded in dismay yet now<br>Assures me that the bitterness of death<br>Is past and we shall live  Whence Haile to thee<br>Eve rightly call’d Mother of all Mankind - Milton 
+ <eos> 
+ In spun Gold with shade of Val ker Elm    <br> By all him long about him high delight      <br> As that dispenst thee saw no distant keepes     <br> In a Or crimeing on his Bowreing seemd      - Words5lines 
+ <eos> 
+ Now we confie her dangerant Maker      <br> No dreadfulful Hierarchs to by God    <br> So shook the Gobvid Angel or thir Arms    <br> spot from high exvention Seat       - Sylabic5lines 
+ <eos> 
+ His radiant state and yet his sure unjust<br> Had fear they to be reign though of thy free <br> Shall fall of evil to prov’d occasion<br> In new self rule and to the Spirits - DPsyllabic5lines 
+ <eos> 
+ The image of whom whom I is is<br> Or coming with the dark and Giants filld <br> Then Porches through this fatal Rod <br> Of Heav’n and darkness still Go of Heav’n  - DPsyllabic5lines 
+ <eos> 
+ And Which he hit like on the Gate of earth     <br> There like thir gift it wisdom and with thee     <br>  and O I we find these was said    <br> No like right Light how now but thou relate      - Sylabic5lines 
+ <eos> 
+Subduing Nations and achievd thereby<br>Fame in the World high titles and rich prey<br>Shall change thir course to pleasure ease and sloth<br>Surfet and lust till wantonness and pride - Milton 
+ <eos> 
+And every creeping thing that creeps the ground<br>This said he formd thee Adam thee O Man<br>Dust of the ground and in thy nostrils breath’d<br>The breath of Life in his own Image hee - Milton 
+ <eos> 
+ And with excessive look we gently move         <br> Then with his heart but at his Feet<br> The Lion met the Accuser of that bliss        <br> Of which in him call’d whereon to work - DPwords5lines 
+ <eos> 
+ By purest spot of time image to be heard     <br> What will he know and is thy thy admird     <br> But God what but these is not hence shall dreamd    <br>  off the Earth rebellious wide      - Sylabic5lines 
+ <eos> 
+ Ended with re hiss of russling Hills he Bees     <br> forms as they thirsted scoop the putting that     <br> To have delight and those whither Man dispulse     <br> Free to before him thus to him afthralld      - Words5lines 
+ <eos> 
+ Creatures and him to be hither Laws and<br> Created his and his Glorie Warr <br> Who of the penaltie Progenie prostrate <br> Which he and may be don to Heav’n  - DPsyllabic5lines 
+ <eos> 
+And bears thee soft with the smooth Air along<br>Sollicit not thy thoughts with matters hid<br>Leave them to God above him serve and feare<br>Of other Creatures as him pleases best - Milton 
+ <eos> 
+ And uttering how air  Man to hee        <br> Created first our love so shall have know<br> Of Angels and of the great Architect         <br> On me in smallest rode more spots to - DPwords5lines 
+ <eos> 
+ Who to the powerful Destiny and pure     <br> Then high else to explode in fact of Warr     <br> Did what I be to God who grew that weak     <br> Then thou in Center for posson as easie      - Words5lines 
+ <eos> 
+ But are not made in many a spacious North     <br> Thither for Devil and like Eyes but build       <br> In silence for eccentric scribld Gold    <br> And that despite is faithful from his God      - Words5lines 
+ <eos> 
+That thou shouldst hope imperious  with threats<br>To chase me hence erre not that so shall end<br>The strife which thou call’st evil but wee style<br>The strife of Glorie which we mean to win - Milton 
+ <eos> 
+ The first of Heavning Fowle her I she cheard     <br> Or all the Treeing Angel guest but new     <br>  on those convention flown and Air     <br> Continate from Aegypt blood as Den       - Sylabic5lines 
+ <eos> 
+ In those atgrate of Spirits and receive     <br> To whom thir angry dwels of earn while Fate     <br> For un my arm not they may beheld      <br> Your dunwark and obdemns with vain of raise      - Words5lines 
+ <eos> 
+ Intentous which stood we list conves      <br> In such right Head they passd us to disturb     <br> Nor on his odious Sire of Heavnest might  <br> I calld the Earth and Morn by Darkness deep     - Sylabic5lines 
+ <eos> 
+Nor that which on the flaming Mount appeerd<br>In Dothan cover’d with a Camp of Fire<br>Against the Syrian King who to surprize<br>One man Assassinlike had levied Warr - Milton 
+ <eos> 
+ To this excess against to his power ensigns     <br> All with the Host of Angels from theyselves     <br> The Tempter and Aepitable Dores         <br> He threw her Sun in Bethel and to work      - Sylabic5lines 
+ <eos> 
+For Gods yet him God the most High voutsafes<br>To call by Vision from his Fathers house<br>His kindred and false Gods into a Land<br>Which he will shew him and from him will raise - Milton 
+ <eos> 
+ So hast a voice and to be to<br> All on the Mount and with his dignitie        <br> Of missive way above the Cyclades Abyss <br> With consort and with wrath as that not heart        - DPwords5lines 
+ <eos> 
+ Satan that faithful thing for things to due     <br> Bestirs him Heavn still and our heart shall seek     <br> Before him high alone best break to Hell      <br> That failing man to but his silent place     - Words5lines 
+ <eos> 
+ And to ask Garlands with sorrow dimm’d the dissonance       <br> Of Angels and in th’ Messiah that them<br> And all the Heav’n in Heav’n and to the voice      <br> Though who in night I known they said - DPwords5lines 
+ <eos> 
+ Streaking when all the Wings of darkest Life     <br> Obbrokn in a strong then casts hisheld      <br> But on him anointed to thy works Reigne       <br> Hell thence he pausd from that Twelve and run     - Words5lines 
+ <eos> 
+ That writh’d the Deep and at they fought<br> Obscure in fixt Gods half the first latest fair       <br> Created all each high but where we move<br> Say first this small or on his business then        - DPwords5lines 
+ <eos> 
+ thee Strength in continue and Battel at all <br> Orb of Heav’n so to their own shape<br> In highth and to be compass head shall<br> For whom in Heav’n hurried evil not saw - DPsyllabic5lines 
+ <eos> 
+ She clov’n with the Trunck <br> His place he went for fed and soft<br> Two other bad and his mortal Power         <br> So don it made and to the count’nance - DPwords5lines
+</textarea>
+</footer>
+
+
+
+
+</html>
+
