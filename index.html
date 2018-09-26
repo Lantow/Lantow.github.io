@@ -3,8 +3,29 @@
 
 <meta charset="utf-8">
 <head>
+<script src="https://www.gstatic.com/firebasejs/5.5.1/firebase.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script type="text/javascript"> 
+<script type="text/javascript">
+
+  // Initialize Firebase
+var config = {
+	apiKey: "AIzaSyDky3Y7syp1xxIrM0tRE473FH3sPA9isMc",
+	authDomain: "poetryturingexperiment.firebaseapp.com",
+	databaseURL: "https://poetryturingexperiment.firebaseio.com",
+	projectId: "poetryturingexperiment",
+	storageBucket: "",
+	messagingSenderId: "527175392899"
+	};
+
+// Initialize your Firebase app
+firebase.initializeApp(config);
+// Reference to your entire Firebase database
+var myFirebase = firebase.database().ref();
+
+// Get a reference to the recommendations object of your Firebase.
+// Note: this doesn't exist yet. But when we write to our Firebase using
+// this reference, it will create this object for us!
+var TEST = myFirebase.child("TEST");
 
 var data = [];
 
@@ -50,16 +71,6 @@ $("document").ready(function(){
 	    return str;
 	}
 
-	var values = [2, 30, 20, 30, 35, 45];
-	$('#semantic').change(function() {
-	    $('span').text(values[this.value]);
-	});
-
-	var values = [2, 30, 20, 30, 35, 45];
-	$('#grammar').change(function() {
-	    $('span').text(values[this.value]);
-	});
-
 	$("button").click(function(){
 		nowTime = new Date().getTime()
 		var time = nowTime - startTime
@@ -72,6 +83,9 @@ $("document").ready(function(){
 		var turing = $(this).html()
 		d = {label:label, grammar:grammar, semantic:semantic, turing:turing, time:time} // ,rythm:rythm, overall:overall}
 		data.push(d);
+		// Push our first recommendation to the end of the list and assign it a
+		// unique ID automatically.
+		TEST.push(d);
 
 		if (i >= all_sents.length) {
 			$("#not_done").hide();
@@ -97,10 +111,10 @@ $("document").ready(function(){
 
 			console.log(d);
 			// Reset values
-			$("#grammar").val(50);
-			$("#semantic").val(50);
-			$("#rythm").val(50);
-			$("#overall").val(50);
+			$("#grammar").val(3);
+			$("#semantic").val(3);
+			$("#rythm").val(3);
+			$("#overall").val(3);
 		};
 	});
 })
