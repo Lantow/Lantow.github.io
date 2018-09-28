@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+
+<meta charset="utf-8">
+<head>
+<script src="https://www.gstatic.com/firebasejs/5.5.1/firebase.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+  // Initialize Firebase
+var config = {
+	apiKey: "AIzaSyDky3Y7syp1xxIrM0tRE473FH3sPA9isMc",
+	authDomain: "poetryturingexperiment.firebaseapp.com",
+	databaseURL: "https://poetryturingexperiment.firebaseio.com",
+	projectId: "poetryturingexperiment",
+	storageBucket: "",
+	messagingSenderId: "527175392899"
+	};
+
+// Initialize your Firebase app
+firebase.initializeApp(config);
+// Reference to your entire Firebase database
+var myFirebase = firebase.database().ref();
+
+// Get a reference to the recommendations object of your Firebase.
+// Note: this doesn't exist yet. But when we write to our Firebase using
+// this reference, it will create this object for us!
+var database = myFirebase.child("TuringExperimentData");
+var user = database.push()
+
+var data = [];
+
+// $("#all_the_stansas").ready(function(){$("#all_the_stansas").load("trial_text.txt")}); 
+
+$("document").ready(function(){
+	 //"http://localhost:8000/trial_text.txt")
+	$("#done").hide();
+	var all_sents = $('#all_the_stansas').val().split("<eos>");
+	$("#count").text(1 + " / " + all_sents.length)
+
+	var startTime = new Date().getTime();
+
+	// console.log(all_sents)
+	// console.log( $('#all_the_stansas').val());
+
+	thishere = all_sents[0].split("-");
+
+	$("#stansa").html(thishere[0]);
+	i = 1;
+
+	function JSON2CSV(objArray) {
+	    var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+	    var str = '';
+	    var line = '';
+
+	    for (var i = 0; i < array.length; i++) {
+	        var line = '';
+
+	        if (true) {
+	            for (var index in array[i]) {
+	                var value = array[i][index] + "";
+	                line += '' + value.replace(/"/g, '') + ',';
+	            }
+	        } else {
+	            for (var index in array[i]) {
+	                line += array[i][index] + ',';
+	            }
+	        }
+	        line = line.slice(0, -1);
+	        str += line + '\r\n';
+	    }
+	    return str;
+	}
+
+	$("button").click(function(){
+		nowTime = new Date().getTime()
+		var time = nowTime - startTime
+		startTime = nowTime
+		// log stansa label - ie. how it was generated
+		var label = thishere[1].replace('\n','').replace(" ", "");
+		// log user assesment
+		var grammar = $("#grammar").val()
+		var semantic = $("#semantic").val()
+		var turing = $(this).html()
+		d = {label:label, grammar:grammar, semantic:semantic, turing:turing, time:time} // ,rythm:rythm, overall:overall}
+		data.push(d);
+		// Push our first recommendation to the end of the list and assign it a
+		// unique ID automatically.
+		user.push(d);
+
+		if (i >= all_sents.length) {
+			$("#not_done").hide();
+			$("#done").show();
+			// // prepare and download data
+			// var csv = JSON2CSV(data);
+			// var downloadLink = document.createElement("a");
+			// var blob = new Blob(["\ufeff", csv]);
+			// var url = URL.createObjectURL(blob);
+			// downloadLink.href = url;
+			// downloadLink.download = "data.txt";
+			// document.body.appendChild(downloadLink);
+			// downloadLink.click();
+		}else {
+			// change sentance
+			thishere = all_sents[i].split("-");
+			$("#stansa").html(thishere[0]);
+			
+			$("#last").text(i+ " was " + label)
+
+			i ++
+			$("#count").text(i + " / " + all_sents.length)
+
+			console.log(d);
+			// Reset values
+			$("#grammar").val(3);
+			$("#semantic").val(3);
+			$("#rythm").val(3);
+			$("#overall").val(3);
+		};
+	});
+})
+</script>
+<style type="text/css">
+html{
+	max-width: 100vw;
+	max-height: 90vw;
+}
+body {
+	text-align: center;
+	margin-left: 5vw;
+	font-family: sans-serif;
+}
+button{
+	border-radius:2vh;
+	margin: 2vw;
+	font-weight: bold;
+}
+.range-slider {
+  margin: 1vw 0 0 0%;
+}
+.range-slider {
+  width: $range-width;
+}
+.range-slider__range {
+  width: 50vw;
+  border-radius: 1vw;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+.poetic_value{
+	display: inline-block;
+}
+ </style>
+
+</head>
+<body>
+	<section id="not_done">
+		<h1 id="stansa"></h1>
+		<div id="count"></div>
+		<form action="">
+
+			<div class="range-slider">
+				<p>HOW <b>GRAMMATICALLY</b> READABLE WAS THE VERS?</p>
+				LOW <input class="range-slider__range" id="grammar" type="range" value="3" min="0" max="6"> HIGH
+			</div>
+
+			<div class="range-slider">
+				<p>HOW <b>POETICALLY</b> INTERPRETABLE WAS THE VERS?</p>
+				LOW <input class="range-slider__range" id="semantic" type="range" value="3" min="0" max="6"> HIGH
+			</div>
+		</form>
+		<br>
+		<br>
+		<button>HUMAN</button><button>MACHINE</button>
+
+		<div id="last"></div>
+	</section>
+	<section id="done">
+		<br><br><br>
+		EXPERIMENT IS NOW CONCLUDED <br>
+		THANK YOU FOR YOUR PARTICIPATION!
+	</section>
+
+</body>
+
+<footer>
+<textarea id="all_the_stansas" style="visibility: hidden"> 
+	Thegressive but th ungodly but to save     <br> Rousd as the day though vitive rest how stood     <br> The Nor side high in batter to the Starrs     <br> And wrought my throne If to his Senple view      - Syllabic split words 
+ <eos> 
+Who durst defie th’ Omnipotent to Arms<br>Nine times the Space that measures Day and Night<br>To mortal men he with his horrid crew<br>Lay vanquisht rowling in the fiery Gulfe - Milton 
+ <eos> 
+So talk’d the spirited sly Snake and Eve<br>Yet more amaz’d unwarie thus reply’d<br>Serpent thy overpraising leaves in doubt<br>The vertue of that Fruit in thee first prov’d - Milton 
+ <eos> 
+ Moist nutriment or the shrill Matin light         <br> bended Dolphins play with his great World to<br> To have express it best the Angelic Angel        <br> Ere in your friendly East it by our - Doubble padded words 
+ <eos> 
+Fruit of delicious Vines the growth of Heav’n<br>They eat they drink and with refection sweet<br>Are fill’d before th’ all bounteous King who showrd<br>With copious hand rejoycing in thir joy - Milton 
+ <eos> 
+ Nor many a berrie and of a kerhole turns   <br> Among hisship Farr how first in Heavn or Night     <br> Out in high face and to a Trees immense     <br> Inbrokn and in seden chivalry         - Plain words 
+ <eos> 
+ Of Atlantean shoulders large yet nigh          <br> A sacred like to thir Finns and Starrie<br> Mount or in night Night Satan he recoild affraid       <br> The highth and in the Western Air they - Doubble padded words 
+ <eos> 
+ Our then my just exageing to that shape     <br> Which as I namd speed we may easie to send     <br> I know to him by this deep may have made  <br> So felt us rose unvaild the wamer sense      - Syllabic split words 
+ <eos> 
+ Bellerophon of God of Hell too as behold      <br> God were makes in He shells to all      <br> Yet to the better place but as began     <br> Of whom my Good surplanted or so haste       - Syllabic split words 
+ <eos> 
+ Of least thir goodstart Towred structures they      <br> He lands him known heated to his Throne     <br> O was first meet he with the sight or Day    <br> That stept this it endaunted to be will       - Syllabic split words 
+ <eos> 
+ Oft with swift errands the warie fiend         <br> With brazen liquors crown’d while death  <br> And his midnight Plant and gently warms         <br> Warriers the space with parting to the bane - Doubble padded words 
+ <eos> 
+When Adam thus to Eve Fair Consort th’ hour<br>Of night and all things now retir’d to rest<br>Mind us of like repose since God hath set<br>Labour and rest as day and night to men - Milton 
+ <eos> 
+  her Regions with great array     <br> The Spirit of Michael of God in Hell       <br> Alnouncd and man will can find Phancob      <br> To Gods right on him Pilteous and beneath      - Syllabic split words 
+ <eos> 
+Because wee freely love as in our will<br>To love or not in this we stand or fall<br>And som are fall’n to disobedience fall’n<br>And so from Heav’n to deepest Hell O fall - Milton 
+ <eos> 
+ shock and through her lower rode retir’d         <br> The rest once highest to the setting Sun<br> Thy image of thy shall mean done Man        <br> Not thou we now invite from Spirits and - Doubble padded words 
+ <eos> 
+ If from the fierce Man strange he with<br> To whom thy general Ancestor repli’d  <br> Adam to behold the happie Son          <br> The favour of thy Glorie and with Hell - Doubble padded words 
+ <eos> 
+ Mans rest though horror must the third enhaps     <br> The own as else intractive in his sight     <br> those Enementions Air for Light     <br> Then be despisd us likes they there in me      - Syllabic split words 
+ <eos> 
+To Judgement he proceeded on th’ accus’d<br>Serpent though brute unable to transferre<br>The Guilt on him who made him instrument<br>Of mischief and polluted from the end - Milton 
+ <eos> 
+ Immortal Sons for Nature foul his face     <br> With in right counsels with aflighten that Arms     <br> Among the sonsful worse comcom shines       <br> That from his hand exdaunted should replyd       - Plain words 
+ <eos> 
+ A unpire is his middle place and Starrs     <br> In this new darkness old celes O fire     <br> regent and thir great world of thee immense     <br> Proud drew out off and murmuring Streams the ground   - Plain words 
+ <eos> 
+This Universe and all created things<br>One foot he center’d and the other turn’d<br>Round through the vast profunditie obscure<br>And said thus farr extend thus farr thy bounds - Milton 
+ <eos> 
+ But so thou stoodst in Heav’n and to be last      <br> At my right hand and made them onely<br> A Heav’n and dance in all a moment wide       <br> With dreadful Artillery had combustion here   - Doubble padded words 
+ <eos> 
+Canst raise thy Creature to what highth thou wilt<br>Of Union or Communion deifi’d<br>I by conversing cannot these erect<br>From prone nor in thir wayes complacence find - Milton 
+ <eos> 
+To mortal men above which only shon<br>Filial obedience as a sacrifice<br>Glad to be offer’d he attends the will<br>Of his great Father  Admiration seis’d - Milton 
+ <eos> 
+ A fellows came of Heavn each comes was stood     <br> His Autumnous in Heavns long of God with strange    <br> Nowvests the Earth a fradance dreadful heads     <br> Thou disvise to can so be avengd       - Syllabic split words 
+ <eos> 
+ Confessing with his Scepter deep remote      <br> So spake and Morning DewdropsDewdrops to her Son     <br> Porficient and displode and void of Morn     <br> And horror had must low might I I strange - Plain words 
+ <eos> 
+ His Bowels many i’th’ Gold and moarie shoare<br> When thus hath that unsay and degree of pain       <br> One matter who to this more shall his<br> Fit through the darksom Games or Saphir Night         - Doubble padded words 
+ <eos> 
+ He in Moloch horrid light when these fresh charmd     <br> Of herning line them first so oft beguild   <br> Immorent might and else aveyd con herds     <br> Nor from the Host and of the Land at Heavn      - Plain words 
+ <eos> 
+ Ended with re hiss of russling Hills he Bees     <br> forms as they thirsted scoop the putting that     <br> To have delight and those whither Man dispulse     <br> Free to before him thus to him afthralld      - Plain words 
+ <eos> 
+ And either to the North though from the Starr     <br> All one so darkting still I love now pass   <br> What I we come with him began in Heavn     <br> Of what they we will not must ever hee       - Plain words 
+ <eos> 
+ Training his hand rebuke him to remorse     <br> With painful Emploid rowling first were bowing Air    <br> Heard on the fence of Heavn the starrie train     <br> To hottus passd which Satan filld      - Plain words 
+ <eos> 
+ Bedsing Victorie from every Trees Earth blow     <br> Rebellion in her flaming sheer but makes     <br> Beholding as the frowning and his wings    <br> Canst from the Book of God structure by Heavn      - Syllabic split words 
+ <eos> 
+ Now wheeling with her Carcass glut decline     <br> And from his consleeping first dis<br> His wings and world but as thir as a rage     <br> None in thir throne swarming scarce or hurld       - Syllabic split words 
+ <eos> 
+With purpose to resign them in full time<br>Up to a better Cov’nant disciplin’d<br>From shadowie Types to Truth from Flesh to Spirit<br>From imposition of strict Laws to free - Milton 
+ <eos> 
+ Who to the powerful Destiny and pure     <br> Then high else to explode in fact of Warr     <br> Did what I be to God who grew that weak     <br> Then thou in Center for posson as easie      - Plain words 
+ <eos> 
+ Nor conaltation if with immor kinde     <br> Yet Arms for Earth on blessed Creatures high      <br> By me or out in matchless Chief or rowld   <br> Or temmoning th Congodly or in Heaven till     - Plain words 
+ <eos> 
+ His bountie Sovran to spend him with rage<br> Or all his place by Heav’n and fair the place      <br> Of flight of Ages at her greater large<br> And with parts dayes and moves from the Skie        - Doubble padded words 
+ <eos> 
+ To illuminate the great Jehovah and them then        <br> Where in the void of Cherub motion <br> To find his piercing Faith or to effect        <br> May wisdom is to let him could transform - Doubble padded words 
+ <eos> 
+ So made and most approach with thou knowst pain     <br> Oftends though intain we O Herbirie     <br> Hard true Foe desert me after thee    <br> O they no like mist thou which thou       - Syllabic split words 
+ <eos> 
+ At them by noblest hand hid firm entwin’d<br> These horror thing to one fled here yet hee       <br> The first we know or Which can rather<br> By them no Worlds they seemd whose dark pursuit        - Doubble padded words
+</textarea>
+</footer>
+
+
+
+
+</html>
+
